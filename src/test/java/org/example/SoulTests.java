@@ -30,6 +30,34 @@ public class SoulTests {
         driver.quit();
     }
 
+    @Nested @DisplayName("When adding a soul")
+    class AddNewSoul{
+        @Test @DisplayName("Should show added soul in the table")
+        void shouldShowAddedSoulInTheTable() throws InterruptedException {
+            driver.get("http://localhost:3000/");
+            driver.findElement((By.id("soul-name"))).sendKeys("Cauê");
+            driver.findElement((By.id("soul-owner"))).sendKeys("Deus");
+
+            final WebElement location = driver.findElement(By.id("soul-location"));
+            final Select select = new Select(location);
+            select.selectByIndex(1);
+            final SoftAssertions softly = new SoftAssertions();
+            softly.assertThat(select.getFirstSelectedOption().getText()).isEqualTo("Céu");
+
+            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
+            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
+            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
+            final int numberOfRows = tableRows.size();
+
+            driver.findElement((By.id("save-btn"))).click();
+            Thread.sleep(1);
+            final List<WebElement> tableRowsAfterInsertion = tableBody.findElements((By.tagName("tr")));
+            final int numberOfRowsAfterInsertion = tableRowsAfterInsertion.size();
+            softly.assertThat(numberOfRowsAfterInsertion).isEqualTo(numberOfRows + 1);
+            softly.assertAll();
+        }
+    }
+    
     @Nested @DisplayName("When removing a soul")
     class RemoveSoul {
 
