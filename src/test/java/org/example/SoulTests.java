@@ -1,5 +1,6 @@
 package org.example;
 
+import com.github.javafaker.Faker;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
@@ -11,8 +12,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import static org.openqa.selenium.By.xpath;
 
 public class SoulTests {
-
     private WebDriver driver;
+    private Faker faker = new Faker();
 
     @BeforeEach
     void setUp() {
@@ -35,8 +36,8 @@ public class SoulTests {
             driver.get("http://localhost:3000/");
 
             // Values to update soul
-            final String changeNameTo = "2";
-            final String changeOwnerTo = "2";
+            final String changeNameTo = faker.name().fullName();
+            final String changeOwnerTo = faker.name().fullName();
             final String changeLocalicationTo = "Céu";
 
             // Clicking the edit button on the first soul of the table
@@ -64,12 +65,12 @@ public class SoulTests {
             // Picking up new soul values
             final String elementOneNameAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[2]")).getText();
             final String elementOneOwnerAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[3]")).getText();
-            final String elementOneLocalicationAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[4]")).getText();
+            final String elementOneLocationAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[4]")).getText();
 
             final var softly = new SoftAssertions();
             softly.assertThat(elementOneNameAfter).isEqualTo(changeNameTo);
             softly.assertThat(elementOneOwnerAfter).isEqualTo(changeOwnerTo);
-            //softly.assertThat(elementOneOwnerAfter).isEqualTo(changeLocalicationTo);
+            //softly.assertThat(elementOneLocationAfter).isEqualTo(changeLocationTo);
             softly.assertAll();
         }
 
