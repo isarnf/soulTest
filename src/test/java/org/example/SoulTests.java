@@ -82,6 +82,10 @@ public class SoulTests {
         void shouldEditTheFirstSoulOfTheTable() throws InterruptedException {
             driver.get("http://localhost:3000/");
 
+            final List<WebElement> rowsTable = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr"));
+            if (rowsTable.size() == 0)
+                throw new NoSuchFieldError("Not found rows in table");
+
             // Values to update soul
             final String changeNameTo = faker.name().fullName();
             final String changeOwnerTo = faker.name().fullName();
