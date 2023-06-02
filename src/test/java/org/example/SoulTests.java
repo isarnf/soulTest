@@ -94,8 +94,6 @@ public class SoulTests {
             // Clicking the edit button on the first soul of the table
             driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[1]")).click();
 
-            Thread.sleep(500);
-
             // Get inputs
             final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
             final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
@@ -114,7 +112,8 @@ public class SoulTests {
             // Clicking in save button
             driver.findElement(xpath("//*[@id=\"save-btn\"]")).click();
 
-            Thread.sleep(500);
+            new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(driver -> driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]")));
 
             // Picking up new soul values
             final String elementOneNameAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[2]")).getText();
