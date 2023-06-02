@@ -3,15 +3,12 @@ package org.example;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.util.Random;
-
-import static org.openqa.selenium.By.*;
+import static org.openqa.selenium.By.xpath;
 
 public class SoulTests {
 
@@ -37,32 +34,34 @@ public class SoulTests {
         void editar() throws InterruptedException {
             driver.get("http://localhost:3000/");
 
-            final String changeNameTo = "2";        Thread.sleep(50);
+            // Values to update soul
+            final String changeNameTo = "2";
             final String changeOwnerTo = "2";
             final String changeLocalicationTo = "Céu";
 
-            final String elementOneName = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[2]")).getText();
-            final String elementOneOwner = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[3]")).getText();
-            final String elementOneLocalication = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[4]")).getText();
-
-            System.out.println(elementOneLocalication);
-
+            // Clicking the edit button on the first soul of the table
             driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[1]")).click();
 
             Thread.sleep(500);
 
+            // Get inputs
             final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
             final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
 
+            //Clear inputs
             inputName.clear();
             inputOwner.clear();
 
+            // Changing entries with new soul values
             inputName.sendKeys(changeNameTo);
             inputOwner.sendKeys(changeOwnerTo);
 
-            final WebElement buttonSave = driver.findElement(xpath("//*[@id=\"save-btn\"]"));
-            buttonSave.click();
+            // Clicking in save button
+            driver.findElement(xpath("//*[@id=\"save-btn\"]")).click();
 
+            Thread.sleep(500);
+
+            // Picking up new soul values
             final String elementOneNameAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[2]")).getText();
             final String elementOneOwnerAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[3]")).getText();
             final String elementOneLocalicationAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[4]")).getText();
@@ -70,7 +69,7 @@ public class SoulTests {
             final var softly = new SoftAssertions();
             softly.assertThat(elementOneNameAfter).isEqualTo(changeNameTo);
             softly.assertThat(elementOneOwnerAfter).isEqualTo(changeOwnerTo);
-            //softly.assertThat(elementOneOwnerAfter).isEqualTo("Deus");
+            //softly.assertThat(elementOneOwnerAfter).isEqualTo(changeLocalicationTo);
             softly.assertAll();
         }
 
