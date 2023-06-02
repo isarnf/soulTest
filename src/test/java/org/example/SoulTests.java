@@ -36,20 +36,20 @@ public class SoulTests {
     @DisplayName("When editing a soul")
     class EditSoul{
 
-        private String luckyTheLocalicationOfTheSoul(){
+        private String luckyTheLocationOfTheSoul(){
             final List<String> locations = Arrays.asList("sky", "hell", "purgatory");
             return locations.get(new Random().nextInt(locations.size()));
         }
 
         @Test
         @DisplayName("Should edit the first soul of the table")
-        void editar() throws InterruptedException {
+        void shouldEditTheFirstSoulOfTheTable() throws InterruptedException {
             driver.get("http://localhost:3000/");
 
             // Values to update soul
             final String changeNameTo = faker.name().fullName();
             final String changeOwnerTo = faker.name().fullName();
-            final String changeLocalicationTo = luckyTheLocalicationOfTheSoul();
+            final String changeLocationTo = luckyTheLocationOfTheSoul();
 
             // Clicking the edit button on the first soul of the table
             driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[1]")).click();
@@ -68,7 +68,7 @@ public class SoulTests {
             // Changing entries with new soul values
             inputName.sendKeys(changeNameTo);
             inputOwner.sendKeys(changeOwnerTo);
-            selectLocalication.selectByValue(changeLocalicationTo);
+            selectLocalication.selectByValue(changeLocationTo);
 
 
             // Clicking in save button
@@ -85,7 +85,7 @@ public class SoulTests {
             final var softly = new SoftAssertions();
             softly.assertThat(elementOneNameAfter).isEqualTo(changeNameTo);
             softly.assertThat(elementOneOwnerAfter).isEqualTo(changeOwnerTo);
-            softly.assertThat(elementOneLocationAfter).isEqualTo(changeLocalicationTo);
+            softly.assertThat(elementOneLocationAfter).isEqualTo(changeLocationTo);
             softly.assertAll();
         }
 
