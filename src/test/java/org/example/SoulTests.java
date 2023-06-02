@@ -13,7 +13,7 @@ import static org.openqa.selenium.By.xpath;
 
 public class SoulTests {
     private WebDriver driver;
-    private Faker faker = new Faker();
+    private final Faker faker = new Faker();
 
     @BeforeEach
     void setUp() {
