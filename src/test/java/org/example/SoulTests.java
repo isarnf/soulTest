@@ -8,6 +8,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Select;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 import static org.openqa.selenium.By.xpath;
 
@@ -30,6 +35,12 @@ public class SoulTests {
     @Nested
     @DisplayName("When editing a soul")
     class EditSoul{
+
+        private String luckyTheLocalicationOfTheSoul(){
+            final List<String> locations = Arrays.asList("sky", "hell", "purgatory");
+            return locations.get(new Random().nextInt(locations.size()));
+        }
+
         @Test
         @DisplayName("Should edit the first soul of the table")
         void editar() throws InterruptedException {
@@ -38,7 +49,7 @@ public class SoulTests {
             // Values to update soul
             final String changeNameTo = faker.name().fullName();
             final String changeOwnerTo = faker.name().fullName();
-            final String changeLocalicationTo = "Céu";
+            final String changeLocalicationTo = luckyTheLocalicationOfTheSoul();
 
             // Clicking the edit button on the first soul of the table
             driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[1]")).click();
@@ -48,6 +59,7 @@ public class SoulTests {
             // Get inputs
             final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
             final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
+            final Select selectLocalication = new Select(driver.findElement(xpath("//*[@id=\"soul-location\"]")));
 
             //Clear inputs
             inputName.clear();
@@ -56,6 +68,8 @@ public class SoulTests {
             // Changing entries with new soul values
             inputName.sendKeys(changeNameTo);
             inputOwner.sendKeys(changeOwnerTo);
+            selectLocalication.selectByValue(changeLocalicationTo);
+
 
             // Clicking in save button
             driver.findElement(xpath("//*[@id=\"save-btn\"]")).click();
@@ -67,10 +81,11 @@ public class SoulTests {
             final String elementOneOwnerAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[3]")).getText();
             final String elementOneLocationAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[4]")).getText();
 
+            // Checking values
             final var softly = new SoftAssertions();
             softly.assertThat(elementOneNameAfter).isEqualTo(changeNameTo);
             softly.assertThat(elementOneOwnerAfter).isEqualTo(changeOwnerTo);
-            //softly.assertThat(elementOneLocationAfter).isEqualTo(changeLocationTo);
+            softly.assertThat(elementOneLocationAfter).isEqualTo(changeLocalicationTo);
             softly.assertAll();
         }
 
