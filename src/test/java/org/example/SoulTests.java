@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -203,6 +204,7 @@ public class SoulTests {
             }
         }
 
+
         @Nested
         @DisplayName("When removing a soul")
         class RemoveSoul {
@@ -231,6 +233,42 @@ public class SoulTests {
                         .until(ExpectedConditions.numberOfElementsToBeLessThan(By.xpath("/html/body/div/div/table/tbody"), initialSize));
                 assertThat(isElementPresent("/html/body/div/div/table/tbody/tr[1]")).isFalse();
             }
+
+        @Test
+        @DisplayName("Should remove the first soul of the table")
+        void shouldRemoveTheFirstSoulOfTheTable() throws InterruptedException {
+            driver.get("http://localhost:3000/");
+
+            final int firstElementIdBeforeExclusion = Integer.parseInt(
+                    new WebDriverWait(driver, Duration.ofSeconds(5))
+                            .until(driver -> driver.findElement
+                                    (By.xpath("/html/body/div/div/table/tbody/tr[1]/td[1]"))
+                            )
+                            .getText()
+            );
+
+            final WebElement button = new WebDriverWait(driver, Duration.ofSeconds(10))
+                    .until(ExpectedConditions.elementToBeClickable
+                            (By.xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[2]"))
+                    );
+            button.click();
+
+            new WebDriverWait(driver, Duration.ofSeconds(10))
+                    .until(ExpectedConditions.alertIsPresent())
+                    .accept();
+
+            Thread.sleep(10);
+
+            final int firstElementIdAfterExclusion = Integer.parseInt(
+                    new WebDriverWait(driver, Duration.ofSeconds(5))
+                            .until(driver -> driver.findElement
+                                    (By.xpath("/html/body/div/div/table/tbody/tr[1]/td[1]"))
+                            )
+                            .getText()
+            );
+
+            assertThat(firstElementIdAfterExclusion).isEqualTo(firstElementIdBeforeExclusion + 1);
+
         }
     }
 
