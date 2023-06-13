@@ -266,9 +266,7 @@ public class SoulTests {
                             )
                             .getText()
             );
-
             assertThat(firstElementIdAfterExclusion).isEqualTo(firstElementIdBeforeExclusion + 1);
-
         }
     }
 
