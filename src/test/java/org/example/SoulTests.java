@@ -15,6 +15,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -34,7 +35,7 @@ public class SoulTests {
     }
 
     @AfterEach
-    void tearDown(){
+    void tearDown() {
         driver.quit();
     }
 
@@ -45,8 +46,8 @@ public class SoulTests {
         @DisplayName("Should show added soul in the table")
         void shouldShowAddedSoulInTheTable() throws InterruptedException {
             driver.get("http://localhost:3000/");
-            driver.findElement((By.id("soul-name"))).sendKeys("Cauê");
-            driver.findElement((By.id("soul-owner"))).sendKeys("Deus");
+            driver.findElement((By.id("soul-name"))).sendKeys("Pessoa A");
+            driver.findElement((By.id("soul-owner"))).sendKeys("Pessoa B");
 
             final WebElement location = driver.findElement(By.id("soul-location"));
             final Select select = new Select(location);
@@ -98,82 +99,140 @@ public class SoulTests {
             softly.assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRows);
             softly.assertAll();
         }
-    }
-
-    @Nested
-    @DisplayName("When editing a soul")
-    class EditSoul {
-
-        private String luckyTheLocationOfTheSoul() {
-            final List<String> locations = Arrays.asList("sky", "hell", "purgatory");
-            return locations.get(new Random().nextInt(locations.size()));
-        }
-
 
         @Test
-        @DisplayName("Should edit the first soul of the table")
-        void shouldEditTheFirstSoulOfTheTable() throws InterruptedException {
+        @DisplayName("Should not have duplicates.")
+        void shouldntHaveDuplicates() {
             driver.get("http://localhost:3000/");
 
-            final List<WebElement> rowsTable = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr"));
-            if (rowsTable.size() == 0)
-                throw new NoSuchFieldError("Not found rows in table");
+            // Make a list of all names, owners and locations
+            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
+            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
+            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
+            final List<String> names = new ArrayList<>();
+            final List<String> owners = new ArrayList<>();
+            final List<String> locations = new ArrayList<>();
 
-            // Values to update soul
-            final String changeNameTo = faker.name().fullName();
-            final String changeOwnerTo = faker.name().fullName();
-            final String changeLocationTo = luckyTheLocationOfTheSoul();
+            // Add all the elements of the table to the lists
+            for (WebElement tableRow : tableRows) {
+                names.add(tableRow.findElements((By.tagName("td"))).get(1).getText());
+                owners.add(tableRow.findElements((By.tagName("td"))).get(2).getText());
+                locations.add(tableRow.findElements((By.tagName("td"))).get(3).getText());
+            }
 
-            // Clicking the edit button on the first soul of the table
-            driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[1]")).click();
+            // Check if there are duplicates in the table
+            boolean foundDuplicate = false;
+            for (int i = 0; i < names.size()-1; i++) {
+                if (names.get(i).equals(names.get(i + 1))) {
+                    for (int j = 0; j < owners.size()-1; j++) {
+                        if (owners.get(j).equals(owners.get(j + 1))) {
+                            for (int k = 0; k < locations.size()-1; k++) {
+                                if (locations.get(k).equals(locations.get(k + 1))) {
+                                    foundDuplicate = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-            // Get inputs
-            final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
-            final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
-            final Select selectLocalication = new Select(driver.findElement(xpath("//*[@id=\"soul-location\"]")));
-
-            //Clear inputs
-            inputName.clear();
-            inputOwner.clear();
-
-            // Changing entries with new soul values
-            inputName.sendKeys(changeNameTo);
-            inputOwner.sendKeys(changeOwnerTo);
-            selectLocalication.selectByValue(changeLocationTo);
-
-
-            // Clicking in save button
-            driver.findElement(xpath("//*[@id=\"save-btn\"]")).click();
-
-            new WebDriverWait(driver, Duration.ofSeconds(5))
-                    .until(driver -> driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]")));
-
-            // Picking up new soul values
-            final String elementOneNameAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[2]")).getText();
-            final String elementOneOwnerAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[3]")).getText();
-            final String elementOneLocationAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[4]")).getText();
-
-            // Checking values
-            final var softly = new SoftAssertions();
-            softly.assertThat(elementOneNameAfter).isEqualTo(changeNameTo);
-            softly.assertThat(elementOneOwnerAfter).isEqualTo(changeOwnerTo);
-            softly.assertThat(elementOneLocationAfter).isEqualTo(changeLocationTo);
-            softly.assertAll();
+            assertThat(foundDuplicate).isFalse();
         }
+
     }
 
-    @Nested
-    @DisplayName("When removing a soul")
-    class RemoveSoul {
+        @Nested
+        @DisplayName("When editing a soul")
+        class EditSoul {
 
-        private boolean isElementPresent(String xpath) {
-            try {
-                driver.findElement(By.xpath(xpath));
-                return true;
-            } catch (NoSuchElementException exception) {
-                return false;
+            private String luckyTheLocationOfTheSoul() {
+                final List<String> locations = Arrays.asList("sky", "hell", "purgatory");
+                return locations.get(new Random().nextInt(locations.size()));
+            }
+
+
+            @Test
+            @DisplayName("Should edit the first soul of the table")
+            void shouldEditTheFirstSoulOfTheTable() throws InterruptedException {
+                driver.get("http://localhost:3000/");
+
+                final List<WebElement> rowsTable = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr"));
+                if (rowsTable.size() == 0)
+                    throw new NoSuchFieldError("Not found rows in table");
+
+                // Values to update soul
+                final String changeNameTo = faker.name().fullName();
+                final String changeOwnerTo = faker.name().fullName();
+                final String changeLocationTo = luckyTheLocationOfTheSoul();
+
+                // Clicking the edit button on the first soul of the table
+                driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[1]")).click();
+
+                // Get inputs
+                final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
+                final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
+                final Select selectLocalication = new Select(driver.findElement(xpath("//*[@id=\"soul-location\"]")));
+
+                //Clear inputs
+                inputName.clear();
+                inputOwner.clear();
+
+                // Changing entries with new soul values
+                inputName.sendKeys(changeNameTo);
+                inputOwner.sendKeys(changeOwnerTo);
+                selectLocalication.selectByValue(changeLocationTo);
+
+
+                // Clicking in save button
+                driver.findElement(xpath("//*[@id=\"save-btn\"]")).click();
+
+                new WebDriverWait(driver, Duration.ofSeconds(5))
+                        .until(driver -> driver.findElement(By.xpath("/html/body/div/div/table/tbody/tr[1]")));
+
+                // Picking up new soul values
+                final String elementOneNameAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[2]")).getText();
+                final String elementOneOwnerAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[3]")).getText();
+                final String elementOneLocationAfter = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]/td[4]")).getText();
+
+                // Checking values
+                final var softly = new SoftAssertions();
+                softly.assertThat(elementOneNameAfter).isEqualTo(changeNameTo);
+                softly.assertThat(elementOneOwnerAfter).isEqualTo(changeOwnerTo);
+                softly.assertThat(elementOneLocationAfter).isEqualTo(changeLocationTo);
+                softly.assertAll();
             }
         }
+
+
+        @Nested
+        @DisplayName("When removing a soul")
+        class RemoveSoul {
+
+            private boolean isElementPresent(String xpath) {
+                try {
+                    driver.findElement(By.xpath(xpath));
+                    return true;
+                } catch (NoSuchElementException exception) {
+                    return false;
+                }
+            }
+
+            @Test
+            @DisplayName("Should remove the first soul of the table")
+            void shouldRemoveTheFirstSoulOfTheTable() throws InterruptedException {
+                driver.get("http://localhost:3000/");
+                final WebElement button = new WebDriverWait(driver, Duration.ofSeconds(10)) // 10s timeout
+                        .until(ExpectedConditions.elementToBeClickable(By.xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[2]")));
+                button.click();
+                final int initialSize = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr/td[1]")).size();
+                new WebDriverWait(driver, Duration.ofSeconds(10))
+                        .until(ExpectedConditions.alertIsPresent())
+                        .accept();
+                new WebDriverWait(driver, Duration.ofSeconds(10))
+                        .until(ExpectedConditions.numberOfElementsToBeLessThan(By.xpath("/html/body/div/div/table/tbody"), initialSize));
+                assertThat(isElementPresent("/html/body/div/div/table/tbody/tr[1]")).isFalse();
+            }
 
         @Test
         @DisplayName("Should remove the first soul of the table")
@@ -212,4 +271,4 @@ public class SoulTests {
 
         }
     }
-}
+
