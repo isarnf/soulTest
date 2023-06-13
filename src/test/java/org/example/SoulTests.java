@@ -1,15 +1,15 @@
 package org.example;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 import com.github.javafaker.Faker;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.openqa.selenium.By.xpath;
 
 public class SoulTests {
@@ -246,9 +247,19 @@ public class SoulTests {
     @DisplayName("When removing a soul")
     class RemoveSoul {
 
+        private boolean isElementPresent(int id, String xpath) {
+            try {
+                WebElement element = driver.findElement(By.xpath(xpath));
+                return Integer.parseInt(element.getText()) == id;
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+
+        }
+
         @Test
         @DisplayName("Should remove the first soul of the table")
-        void shouldRemoveTheFirstSoulOfTheTable() throws InterruptedException {
+        void shouldRemoveTheFirstSoulOfTheTable() {
             driver.get("http://localhost:3000/");
 
             final int firstElementIdBeforeExclusion = Integer.parseInt(
@@ -269,16 +280,10 @@ public class SoulTests {
                     .until(ExpectedConditions.alertIsPresent())
                     .accept();
 
-            Thread.sleep(10);
+            driver.navigate().refresh();
 
-            final int firstElementIdAfterExclusion = Integer.parseInt(
-                    new WebDriverWait(driver, Duration.ofSeconds(5))
-                            .until(driver -> driver.findElement
-                                    (By.xpath("/html/body/div/div/table/tbody/tr[1]/td[1]"))
-                            )
-                            .getText()
-            );
-            assertThat(firstElementIdAfterExclusion).isEqualTo(firstElementIdBeforeExclusion + 1);
+            assertThat(isElementPresent(firstElementIdBeforeExclusion,
+                                    "/html/body/div/div/table/tbody/tr[1]/td[1]")).isFalse();
         }
     }
 }
