@@ -65,6 +65,38 @@ public class SoulTests {
             softly.assertThat(numberOfRowsAfterInsertion).isEqualTo(numberOfRows + 1);
             softly.assertAll();
         }
+
+        @Test
+        @DisplayName("Should not add soul when fields are empty.")
+        void shouldntAddSoulWhenFormIsEmpty() throws InterruptedException {
+            driver.get("http://localhost:3000/");
+
+            // Leave text inputs empty
+            driver.findElement((By.id("soul-name"))).sendKeys("");
+            driver.findElement((By.id("soul-owner"))).sendKeys("");
+
+            // Leave selection box unchanged
+            final WebElement location = driver.findElement(By.id("soul-location"));
+            final Select select = new Select(location);
+            select.selectByIndex(0);
+
+            // Count the number of table rows before save button click
+            final SoftAssertions softly = new SoftAssertions();
+            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
+            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
+            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
+            final int numberOfRows = tableRows.size();
+
+            // Click the button
+            driver.findElement((By.id("save-btn"))).click();
+            Thread.sleep(20);
+
+            // Count number of table rows after save button click
+            final List<WebElement> tableRowsAfterSaveButtonClick = tableBody.findElements((By.tagName("tr")));
+            final int numberOfRowsAfterSaveButtonClick = tableRowsAfterSaveButtonClick.size();
+            softly.assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRows);
+            softly.assertAll();
+        }
     }
 
     @Nested
