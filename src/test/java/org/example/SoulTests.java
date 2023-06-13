@@ -140,6 +140,43 @@ public class SoulTests {
             assertThat(foundDuplicate).isFalse();
         }
 
+        @Test
+        @DisplayName("Should not add duplicates.")
+        void shouldntAddDuplicates() throws InterruptedException {
+            driver.get("http://localhost:3000/");
+            final SoftAssertions softly = new SoftAssertions();
+
+            // Check if table contain rows
+            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
+            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
+            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
+            final int numberOfRows = tableRows.size();
+            softly.assertThat(numberOfRows).isGreaterThan(0);
+
+
+            // Get the values of first row
+            final String nameFirstRow = tableRows.get(0).findElements((By.tagName("td"))).get(1).getText();
+            final String ownerFirstRow = tableRows.get(0).findElements((By.tagName("td"))).get(2).getText();
+            final String locationFirstRow = tableRows.get(0).findElements((By.tagName("td"))).get(3).getText();
+
+            // Fill form inputs with same values of the first row
+            driver.findElement((By.id("soul-name"))).sendKeys(nameFirstRow);
+            driver.findElement((By.id("soul-owner"))).sendKeys(ownerFirstRow);
+            final WebElement location = driver.findElement(By.id("soul-location"));
+            final Select select = new Select(location);
+            select.selectByValue(locationFirstRow);
+
+            // Click the save button
+            driver.findElement((By.id("save-btn"))).click();
+            Thread.sleep(20);
+
+            // Count number of table rows after saving
+            final List<WebElement> tableRowsAfterSaveButtonClick = tableBody.findElements((By.tagName("tr")));
+            final int numberOfRowsAfterSaveButtonClick = tableRowsAfterSaveButtonClick.size();
+            softly.assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRows);
+            softly.assertAll();
+        }
+
     }
 
     @Nested
