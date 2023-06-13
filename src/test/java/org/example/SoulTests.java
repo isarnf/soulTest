@@ -208,32 +208,7 @@ public class SoulTests {
         @Nested
         @DisplayName("When removing a soul")
         class RemoveSoul {
-
-            private boolean isElementPresent(String xpath) {
-                try {
-                    driver.findElement(By.xpath(xpath));
-                    return true;
-                } catch (NoSuchElementException exception) {
-                    return false;
-                }
-            }
-
-            @Test
-            @DisplayName("Should remove the first soul of the table")
-            void shouldRemoveTheFirstSoulOfTheTable() throws InterruptedException {
-                driver.get("http://localhost:3000/");
-                final WebElement button = new WebDriverWait(driver, Duration.ofSeconds(10)) // 10s timeout
-                        .until(ExpectedConditions.elementToBeClickable(By.xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[2]")));
-                button.click();
-                final int initialSize = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr/td[1]")).size();
-                new WebDriverWait(driver, Duration.ofSeconds(10))
-                        .until(ExpectedConditions.alertIsPresent())
-                        .accept();
-                new WebDriverWait(driver, Duration.ofSeconds(10))
-                        .until(ExpectedConditions.numberOfElementsToBeLessThan(By.xpath("/html/body/div/div/table/tbody"), initialSize));
-                assertThat(isElementPresent("/html/body/div/div/table/tbody/tr[1]")).isFalse();
-            }
-
+            
         @Test
         @DisplayName("Should remove the first soul of the table")
         void shouldRemoveTheFirstSoulOfTheTable() throws InterruptedException {
