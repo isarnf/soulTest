@@ -86,48 +86,37 @@ public class SoulTests {
     @Nested
     @DisplayName("When adding a soul")
     class AddNewSoul {
+
+        private WebElement getTableBody(WebDriver driver) {
+            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
+            return table.findElement((By.xpath("/html/body/div/div/table/tbody")));
+        }
+
         @Test
         @DisplayName("Should show added soul in the table")
         void shouldShowAddedSoulInTheTable() throws InterruptedException {
-            driver.findElement((By.id("soul-name"))).sendKeys("Pessoa A");
-            driver.findElement((By.id("soul-owner"))).sendKeys("Pessoa B");
 
-            final WebElement location = driver.findElement(By.id("soul-location"));
-            final Select select = new Select(location);
-            select.selectByIndex(1);
-            final SoftAssertions softly = new SoftAssertions();
-            softly.assertThat(select.getFirstSelectedOption().getText()).isEqualTo("Céu");
+            fillInputs(driver, "Pessoa A", "Pessoa B", "sky");
 
-            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
-            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
-            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
-            final int numberOfRows = tableRows.size();
+            final List<WebElement> tableRowsBeforeSaveButtonClick = getRows(driver);
+            final int numberOfRowsBeforeSaveButtonClick = tableRowsBeforeSaveButtonClick.size();
 
-            driver.findElement((By.id("save-btn"))).click();
-            Thread.sleep(20);
-            final List<WebElement> tableRowsAfterInsertion = tableBody.findElements((By.tagName("tr")));
-            final int numberOfRowsAfterInsertion = tableRowsAfterInsertion.size();
-            softly.assertThat(numberOfRowsAfterInsertion).isEqualTo(numberOfRows + 1);
-            softly.assertAll();
+            clickSaveButton(driver);
+            driver.navigate().refresh();
+
+            final List<WebElement> tableRowsAfterSaveButtonClick = getRows(driver);
+            final int numberOfRowsAfterSaveButtonClick = tableRowsAfterSaveButtonClick.size();
+            assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRowsBeforeSaveButtonClick + 1);
+
         }
 
         @Test
         @DisplayName("Should not add soul when fields are empty.")
         void shouldntAddSoulWhenFormIsEmpty() throws InterruptedException {
-            // Leave text inputs empty
-            driver.findElement((By.id("soul-name"))).sendKeys("");
-            driver.findElement((By.id("soul-owner"))).sendKeys("");
 
-            // Leave selection box unchanged
-            final WebElement location = driver.findElement(By.id("soul-location"));
-            final Select select = new Select(location);
-            select.selectByIndex(0);
+            fillInputs(driver, "", "", "");
 
-            // Count the number of table rows before save button click
-            final SoftAssertions softly = new SoftAssertions();
-            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
-            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
-            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
+            final List<WebElement> tableRows = getRows(driver);
             final int numberOfRows = tableRows.size();
 
             // Click the button
