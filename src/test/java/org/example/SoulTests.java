@@ -38,25 +38,26 @@ public class SoulTests {
         driver.quit();
     }
 
-    private List<WebElement> getRows (WebDriver driver){
+    private List<WebElement> getRows(WebDriver driver) {
         final List<WebElement> rows = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr"));
         if (rows == null)
             throw new NoSuchElementException("Table is empty");
 
         return rows;
     }
-    private WebElement findSoulById(WebDriver driver, String id){
+
+    private WebElement findSoulById(WebDriver driver, String id) {
         final List<WebElement> rows = getRows(driver);
 
-        for(WebElement e: rows)
-            if(e.findElements(By.tagName("td")).get(0).getText().equals(id))
+        for (WebElement e : rows)
+            if (e.findElements(By.tagName("td")).get(0).getText().equals(id))
                 return e;
 
 
         throw new NoSuchElementException("Soul not found");
     }
 
-    private void fillInputs(WebDriver driver, String name, String owner, String location){
+    private void fillInputs(WebDriver driver, String name, String owner, String location) {
         final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
         final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
         final Select selectLocalication = new Select(driver.findElement(xpath("//*[@id=\"soul-location\"]")));
@@ -66,7 +67,15 @@ public class SoulTests {
         selectLocalication.selectByValue(location);
     }
 
-    private void clickSaveButton(WebDriver driver){
+    private void clickTheSoulEditButton(WebElement soul) {
+        soul.findElements(By.tagName("td")).get(4).findElements(By.tagName("button")).get(0).click();
+    }
+
+    private void clickTheSoulDeleteButton(WebElement soul) {
+        soul.findElements(By.tagName("td")).get(4).findElements(By.tagName("button")).get(1).click();
+    }
+
+    private void clickSaveButton(WebDriver driver) {
         driver.findElement(xpath("/html/body/div/form/div[3]/input")).click();
     }
 
@@ -219,7 +228,7 @@ public class SoulTests {
             return locations.get(new Random().nextInt(locations.size()));
         }
 
-        private void cleanInputs(WebDriver driver){
+        private void cleanInputs(WebDriver driver) {
             final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
             final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
             final Select selectLocalication = new Select(driver.findElement(xpath("//*[@id=\"soul-location\"]")));
@@ -229,12 +238,14 @@ public class SoulTests {
             selectLocalication.selectByVisibleText("Selecione");
         }
 
-        private String clickEditFirstElementTable(WebDriver driver){
+        private WebElement getFirstSoulInTable(WebDriver driver) {
             WebElement soul = driver.findElement(xpath("/html/body/div/div/table/tbody/tr[1]"));
-
             if (soul == null)
                 throw new NoSuchElementException("Soul not found");
-            soul.findElements(By.tagName("td")).get(4).findElements(By.tagName("button")).get(0).click();
+            return soul;
+        }
+
+        private String getSoulId(WebElement soul) {
             return soul.findElements(By.tagName("td")).get(0).getText();
         }
 
@@ -247,7 +258,10 @@ public class SoulTests {
             final String changeOwnerTo = faker.name().fullName();
             final String changeLocationTo = luckyTheLocationOfTheSoul();
 
-            String id = clickEditFirstElementTable(driver);
+            final WebElement firstSoulInTable = getFirstSoulInTable(driver);
+            final String id = getSoulId(firstSoulInTable);
+            clickTheSoulEditButton(firstSoulInTable);
+
             cleanInputs(driver);
             fillInputs(driver, changeNameTo, changeOwnerTo, changeLocationTo);
             clickSaveButton(driver);
