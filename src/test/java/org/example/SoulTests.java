@@ -117,23 +117,21 @@ public class SoulTests {
 
         @Test
         @DisplayName("Should not add soul when fields are empty.")
-        void shouldntAddSoulWhenFormIsEmpty() throws InterruptedException {
+        void shouldntAddSoulWhenFormIsEmpty() {
 
             fillInputs(driver, "", "", "");
 
-            final List<WebElement> tableRows = getRows(driver);
-            final int numberOfRows = tableRows.size();
+            final List<WebElement> tableRowsBeforeSaveButtonClick = getRows(driver);
+            final int numberOfRowsBeforeSaveButtonClick = tableRowsBeforeSaveButtonClick.size();
 
-            // Click the button
-            driver.findElement((By.id("save-btn"))).click();
-            Thread.sleep(20);
+            clickSaveButton(driver);
+            driver.navigate().refresh();
 
-            // Count number of table rows after save button click
-            final List<WebElement> tableRowsAfterSaveButtonClick = tableBody.findElements((By.tagName("tr")));
+            final List<WebElement> tableRowsAfterSaveButtonClick = getRows(driver);
             final int numberOfRowsAfterSaveButtonClick = tableRowsAfterSaveButtonClick.size();
-            softly.assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRows);
-            softly.assertAll();
+            assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRowsBeforeSaveButtonClick);
         }
+
 
         @Test
         @DisplayName("Should not have duplicates.")
