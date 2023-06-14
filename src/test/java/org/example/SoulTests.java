@@ -40,7 +40,8 @@ public class SoulTests {
     }
 
     private List<WebElement> getRows(WebDriver driver) {
-        final List<WebElement> rows = driver.findElements(By.xpath("/html/body/div/div/table/tbody/tr"));
+        final List<WebElement> rows = new WebDriverWait(driver, Duration.ofSeconds(3))
+                .until(driver1 -> driver1.findElements(By.xpath("/html/body/div/div/table/tbody/tr")));
         if (rows == null)
             throw new NoSuchElementException("Table is empty");
 
