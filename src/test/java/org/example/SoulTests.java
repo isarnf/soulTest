@@ -92,14 +92,27 @@ public class SoulTests {
     @DisplayName("When adding a soul")
     class AddNewSoul {
 
-        private WebElement getTableBody(WebDriver driver) {
-            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
-            return table.findElement((By.xpath("/html/body/div/div/table/tbody")));
+        private String getNameValueFromRow(WebDriver driver, int rowIndex){
+            final List<WebElement> tableRows = getRows(driver);
+            final String name = tableRows.get(rowIndex).findElements((By.tagName("td"))).get(1).getText();
+            return name;
+        }
+
+        private String getOwnerValueFromRow(WebDriver driver, int rowIndex){
+            final List<WebElement> tableRows = getRows(driver);
+            final String owner = tableRows.get(rowIndex).findElements((By.tagName("td"))).get(2).getText();
+            return owner;
+        }
+
+        private String getLocationValueFromRow(WebDriver driver, int rowIndex){
+            final List<WebElement> tableRows = getRows(driver);
+            final String location = tableRows.get(rowIndex).findElements((By.tagName("td"))).get(3).getText();
+            return location;
         }
 
         @Test
         @DisplayName("Should show added soul in the table")
-        void shouldShowAddedSoulInTheTable() throws InterruptedException {
+        void shouldShowAddedSoulInTheTable() {
 
             fillInputs(driver, "Pessoa A", "Pessoa B", "sky");
 
@@ -131,43 +144,37 @@ public class SoulTests {
             final int numberOfRowsAfterSaveButtonClick = tableRowsAfterSaveButtonClick.size();
             assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRowsBeforeSaveButtonClick);
         }
-        
+
         @Test
         @DisplayName("Should not add duplicates.")
-        void shouldntAddDuplicates() throws InterruptedException {
+        void shouldntAddDuplicates() {
+
             final SoftAssertions softly = new SoftAssertions();
 
-            // Check if table contain rows
-            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
-            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
-            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
-            final int numberOfRows = tableRows.size();
-            softly.assertThat(numberOfRows).isGreaterThan(0);
+            // Count the number of rows before saving
+            final List<WebElement> tableRows = getRows(driver);
+            final int numberOfRowsBeforeSaveButtonClick = tableRows.size();
+            softly.assertThat(numberOfRowsBeforeSaveButtonClick).isGreaterThan(0);
 
-
-            // Get the values of first row
-            final String nameFirstRow = tableRows.get(0).findElements((By.tagName("td"))).get(1).getText();
-            final String ownerFirstRow = tableRows.get(0).findElements((By.tagName("td"))).get(2).getText();
-            final String locationFirstRow = tableRows.get(0).findElements((By.tagName("td"))).get(3).getText();
+            // Get the values from first row
+            final String nameFirstRow = getNameValueFromRow(driver,0);
+            final String ownerFirstRow = getOwnerValueFromRow(driver,0);
+            final String locationFirstRow = getLocationValueFromRow(driver,0);
 
             // Fill form inputs with same values of the first row
-            driver.findElement((By.id("soul-name"))).sendKeys(nameFirstRow);
-            driver.findElement((By.id("soul-owner"))).sendKeys(ownerFirstRow);
-            final WebElement location = driver.findElement(By.id("soul-location"));
-            final Select select = new Select(location);
-            select.selectByValue(locationFirstRow);
+            fillInputs(driver, nameFirstRow, ownerFirstRow, locationFirstRow);
 
             // Click the save button
-            driver.findElement((By.id("save-btn"))).click();
-            Thread.sleep(20);
+            clickSaveButton(driver);
+            driver.navigate().refresh();
 
             // Count number of table rows after saving
-            final List<WebElement> tableRowsAfterSaveButtonClick = tableBody.findElements((By.tagName("tr")));
+            final List<WebElement> tableRowsAfterSaveButtonClick = getRows(driver);
             final int numberOfRowsAfterSaveButtonClick = tableRowsAfterSaveButtonClick.size();
-            softly.assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRows);
+            softly.assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRowsBeforeSaveButtonClick);
             softly.assertAll();
-        }
 
+        }
     }
 
     @Nested
