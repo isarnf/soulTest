@@ -31,6 +31,7 @@ public class SoulTests {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
         driver = new ChromeDriver(options);
+        driver.get("http://localhost:3000/");
     }
 
     @AfterEach
@@ -76,7 +77,6 @@ public class SoulTests {
         @Test
         @DisplayName("Should show added soul in the table")
         void shouldShowAddedSoulInTheTable() throws InterruptedException {
-            driver.get("http://localhost:3000/");
             driver.findElement((By.id("soul-name"))).sendKeys("Pessoa A");
             driver.findElement((By.id("soul-owner"))).sendKeys("Pessoa B");
 
@@ -102,8 +102,6 @@ public class SoulTests {
         @Test
         @DisplayName("Should not add soul when fields are empty.")
         void shouldntAddSoulWhenFormIsEmpty() throws InterruptedException {
-            driver.get("http://localhost:3000/");
-
             // Leave text inputs empty
             driver.findElement((By.id("soul-name"))).sendKeys("");
             driver.findElement((By.id("soul-owner"))).sendKeys("");
@@ -134,8 +132,6 @@ public class SoulTests {
         @Test
         @DisplayName("Should not have duplicates.")
         void shouldntHaveDuplicates() {
-            driver.get("http://localhost:3000/");
-
             // Make a list of all names, owners and locations
             final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
             final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
@@ -174,7 +170,6 @@ public class SoulTests {
         @Test
         @DisplayName("Should not add duplicates.")
         void shouldntAddDuplicates() throws InterruptedException {
-            driver.get("http://localhost:3000/");
             final SoftAssertions softly = new SoftAssertions();
 
             // Check if table contain rows
@@ -241,8 +236,6 @@ public class SoulTests {
         @Test
         @DisplayName("Should edit the first soul of the table")
         void shouldEditTheFirstSoulOfTheTable() {
-            driver.get("http://localhost:3000/");
-
             final String changeNameTo = faker.name().fullName();
             final String changeOwnerTo = faker.name().fullName();
             final String changeLocationTo = luckyTheLocationOfTheSoul();
@@ -286,7 +279,6 @@ public class SoulTests {
         @Test
         @DisplayName("Should remove the first soul of the table")
         void shouldRemoveTheFirstSoulOfTheTable() {
-            driver.get("http://localhost:3000/");
 
             final int firstElementIdBeforeExclusion = Integer.parseInt(
                     new WebDriverWait(driver, Duration.ofSeconds(5))
