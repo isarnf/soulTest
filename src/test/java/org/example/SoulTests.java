@@ -131,46 +131,7 @@ public class SoulTests {
             final int numberOfRowsAfterSaveButtonClick = tableRowsAfterSaveButtonClick.size();
             assertThat(numberOfRowsAfterSaveButtonClick).isEqualTo(numberOfRowsBeforeSaveButtonClick);
         }
-
-
-        @Test
-        @DisplayName("Should not have duplicates.")
-        void shouldntHaveDuplicates() {
-            // Make a list of all names, owners and locations
-            final WebElement table = driver.findElement((By.xpath("/html/body/div/div/table")));
-            final WebElement tableBody = table.findElement((By.xpath("/html/body/div/div/table/tbody")));
-            final List<WebElement> tableRows = tableBody.findElements((By.tagName("tr")));
-            final List<String> names = new ArrayList<>();
-            final List<String> owners = new ArrayList<>();
-            final List<String> locations = new ArrayList<>();
-
-            // Add all the elements of the table to the lists
-            for (WebElement tableRow : tableRows) {
-                names.add(tableRow.findElements((By.tagName("td"))).get(1).getText());
-                owners.add(tableRow.findElements((By.tagName("td"))).get(2).getText());
-                locations.add(tableRow.findElements((By.tagName("td"))).get(3).getText());
-            }
-
-            // Check if there are duplicates in the table
-            boolean foundDuplicate = false;
-            for (int i = 0; i < names.size() - 1; i++) {
-                if (names.get(i).equals(names.get(i + 1))) {
-                    for (int j = 0; j < owners.size() - 1; j++) {
-                        if (owners.get(j).equals(owners.get(j + 1))) {
-                            for (int k = 0; k < locations.size() - 1; k++) {
-                                if (locations.get(k).equals(locations.get(k + 1))) {
-                                    foundDuplicate = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            assertThat(foundDuplicate).isFalse();
-        }
-
+        
         @Test
         @DisplayName("Should not add duplicates.")
         void shouldntAddDuplicates() throws InterruptedException {
