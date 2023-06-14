@@ -48,16 +48,6 @@ public class SoulTests {
         return rows;
     }
 
-    private WebElement findSoulById(WebDriver driver, String id) {
-        final List<WebElement> rows = getRows(driver);
-
-        for (WebElement e : rows)
-            if (e.findElements(By.tagName("td")).get(0).getText().equals(id))
-                return e;
-
-        return null;
-    }
-
     private void fillInputs(WebDriver driver, String name, String owner, String location) {
         final WebElement inputName = driver.findElement(xpath("//*[@id=\"soul-name\"]"));
         final WebElement inputOwner = driver.findElement(xpath("//*[@id=\"soul-owner\"]"));
@@ -82,6 +72,20 @@ public class SoulTests {
 
     private void clickSaveButton(WebDriver driver) {
         driver.findElement(xpath("/html/body/div/form/div[3]/input")).click();
+    }
+
+    private WebElement findSoulById(WebDriver driver, String id) {
+        final List<WebElement> rows = getRows(driver);
+
+        for (WebElement e : rows)
+            if (e.findElements(By.tagName("td")).get(0).getText().equals(id))
+                return e;
+
+        return null;
+    }
+
+    private String getSoulId(WebElement soul) {
+        return soul.findElements(By.tagName("td")).get(0).getText();
     }
 
     @Nested
@@ -233,10 +237,6 @@ public class SoulTests {
             return soul;
         }
 
-        private String getSoulId(WebElement soul) {
-            return soul.findElements(By.tagName("td")).get(0).getText();
-        }
-
         @Test
         @DisplayName("Should edit the first soul of the table")
         void shouldEditTheFirstSoulOfTheTable() {
@@ -282,7 +282,7 @@ public class SoulTests {
                             (By.xpath("/html/body/div/div/table/tbody/tr[1]"))
                     );
 
-            final String idOfFirstSoulBeforeExclusion = soul.findElements(By.tagName("td")).get(0).getText();
+            final String idOfFirstSoulBeforeExclusion = getSoulId(soul);
 
             clickTheSoulDeleteButton(soul);
 
