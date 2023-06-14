@@ -54,8 +54,7 @@ public class SoulTests {
             if (e.findElements(By.tagName("td")).get(0).getText().equals(id))
                 return e;
 
-
-        throw new NoSuchElementException("Soul not found");
+        return null;
     }
 
     private void fillInputs(WebDriver driver, String name, String owner, String location) {
@@ -73,7 +72,11 @@ public class SoulTests {
     }
 
     private void clickTheSoulDeleteButton(WebElement soul) {
-        soul.findElements(By.tagName("td")).get(4).findElements(By.tagName("button")).get(1).click();
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.elementToBeClickable(
+                        soul.findElements(By.tagName("td")).get(4).findElements(By.tagName("button")).get(1))
+                )
+                .click();
     }
 
     private void clickSaveButton(WebDriver driver) {
@@ -280,33 +283,18 @@ public class SoulTests {
     @DisplayName("When removing a soul")
     class RemoveSoul {
 
-        private boolean isElementPresent(int id, String xpath) {
-            try {
-                WebElement element = driver.findElement(By.xpath(xpath));
-                return Integer.parseInt(element.getText()) == id;
-            } catch (NoSuchElementException e) {
-                return false;
-            }
-
-        }
-
         @Test
         @DisplayName("Should remove the first soul of the table")
         void shouldRemoveTheFirstSoulOfTheTable() {
 
-            final int firstElementIdBeforeExclusion = Integer.parseInt(
-                    new WebDriverWait(driver, Duration.ofSeconds(5))
-                            .until(driver -> driver.findElement
-                                    (By.xpath("/html/body/div/div/table/tbody/tr[1]/td[1]"))
-                            )
-                            .getText()
-            );
-
-            final WebElement button = new WebDriverWait(driver, Duration.ofSeconds(10))
-                    .until(ExpectedConditions.elementToBeClickable
-                            (By.xpath("/html/body/div/div/table/tbody/tr[1]/td[5]/button[2]"))
+            final WebElement soul = new WebDriverWait(driver, Duration.ofSeconds(10))
+                    .until(driver -> driver.findElement
+                            (By.xpath("/html/body/div/div/table/tbody/tr[1]"))
                     );
-            button.click();
+
+            final String idOfFirstSoulBeforeExclusion = soul.findElements(By.tagName("td")).get(0).getText();
+
+            clickTheSoulDeleteButton(soul);
 
             new WebDriverWait(driver, Duration.ofSeconds(10))
                     .until(ExpectedConditions.alertIsPresent())
@@ -314,8 +302,9 @@ public class SoulTests {
 
             driver.navigate().refresh();
 
-            assertThat(isElementPresent(firstElementIdBeforeExclusion,
-                                    "/html/body/div/div/table/tbody/tr[1]/td[1]")).isFalse();
+            boolean elementIsNotPresent = findSoulById(driver, idOfFirstSoulBeforeExclusion) == null;
+
+            assertThat(elementIsNotPresent).isTrue();
         }
     }
 }
