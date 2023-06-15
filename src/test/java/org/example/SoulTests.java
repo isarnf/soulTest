@@ -1,6 +1,7 @@
 package org.example;
 
 import com.github.javafaker.Faker;
+import com.sun.jna.Structure;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
@@ -86,6 +87,16 @@ public class SoulTests {
 
     private String getSoulId(WebElement soul) {
         return soul.findElements(By.tagName("td")).get(0).getText();
+    }
+
+    @Nested
+    @DisplayName("When loading landing page")
+    class LoadingLandingPage {
+        @Test
+        @DisplayName("Should show emojis")
+        void shouldShowEmojis() {
+            assertThat(driver.findElement(xpath("/html/body/div/h3")).isDisplayed()).isTrue();
+        }
     }
 
     @Nested
