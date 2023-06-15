@@ -181,7 +181,7 @@ public class SoulTests {
     @DisplayName("When editing a soul")
     class EditSoul {
 
-        private String luckyTheLocationOfTheSoul() {
+        private String getRandomLocation() {
             final List<String> locations = Arrays.asList("sky", "hell", "purgatory");
             return locations.get(new Random().nextInt(locations.size()));
         }
@@ -208,7 +208,7 @@ public class SoulTests {
         void shouldEditTheFirstSoulOfTheTable() {
             final String changeNameTo = faker.name().fullName();
             final String changeOwnerTo = faker.name().fullName();
-            final String changeLocationTo = luckyTheLocationOfTheSoul();
+            final String changeLocationTo = getRandomLocation();
 
             final WebElement firstSoulInTable = getFirstSoulInTable(driver);
             final String id = getSoulId(firstSoulInTable);
